@@ -2,6 +2,8 @@
 
 This README provides comprehensive instructions on setting up and using the Polestar Literature Mining Tool, a web application designed to help researchers efficiently extract and analyze scientific papers from databases like PubMed and DOAJ. This tool leverages natural language processing and machine learning techniques to enhance the accuracy and interpretability of research article searches and analysis.
 
+![Literature Mining Tool](./LiteratureMiningTool.png)
+
 ## Prerequisites
 
 Before beginning, ensure your system has Python installed. If Python is not installed, follow these steps to install it.
