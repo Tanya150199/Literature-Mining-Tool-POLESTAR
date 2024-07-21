@@ -4,11 +4,23 @@ from literature_mining import literature_mining_tool, answer_question
 
 app = Flask(__name__)
 
+def download_nltk_data():
+    try:
+        nltk.data.find('corpora/stopwords.zip')
+    except LookupError:
+        nltk.download('stopwords', quiet=True)
+    try:
+        nltk.data.find('corpora/wordnet.zip')
+    except LookupError:
+        nltk.download('wordnet', quiet=True)
+    try:
+        nltk.data.find('tokenizers/punkt.zip')
+    except LookupError:
+        nltk.download('punkt', quiet=True)
+
 @app.before_first_request
 def setup():
-    nltk.download('stopwords')
-    nltk.download('wordnet')
-    nltk.download('punkt')
+    download_nltk_data()
 
 @app.route('/')
 def index():
