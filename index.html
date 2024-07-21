@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Polestar Literature Mining Tool</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        .header {
+            background-color: #ffffff;
+            padding: 10px 0;
+            border-bottom: 3px solid #004a99;
+            text-align: center;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .logo {
+            width: 200px;
+            margin: auto;
+        }
+        .btn-primary {
+            background-color: #004a99;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #003366;
+        }
+        .form-group {
+            margin-top: 20px;
+        }
+        #results, #answerResult {
+            margin-top: 20px;
+        }
+        .loader {
+            visibility: hidden; /* Initially set to hidden */
+            width: 48px;
+            height: 48px;
+            border: 5px solid #FFF;
+            border-bottom-color: #FF3D00;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+        @keyframes rotation {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        /* Additional CSS for styling table headers */
+        table th {
+            font-weight: bold; /* Make font bold */
+            text-align: center; /* Center-align text */
+            text-transform: capitalize; /* Capitalize the first letter of each word */
+        }
+        table {
+            width: 100%; /* Full-width table */
+            table-layout: fixed; /* Fixed table layout */
+        }
+        th, td {
+            word-wrap: break-word; /* Ensure that words wrap and break correctly */
+            overflow-wrap: break-word;
+            max-width: 250px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="static/polestar_logo.png" alt="Polestar Logo" class="logo">
+    </div>
+    <div class="container">
+        <h1 class="text-center">Polestar Literature Mining Tool</h1>
+        <form id="searchForm">
+            <div class="form-group">
+                <label for="query">Search Query:</label>
+                <input type="text" class="form-control" id="query" name="query" required>
+            </div>
+            <div class="form-group">
+                <label for="max_results">Max Results:</label>
+                <input type="number" class="form-control" id="max_results" name="max_results" value="10" required>
+            </div>
+            <div class="form-group">
+                <label for="source">Select Source:</label>
+                <select class="form-control" id="source" name="source">
+                    <option value="pubmed">PubMed</option>
+                    <option value="doaj">DOAJ</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Search</button>
+        </form>
+        <div class="loader"></div>
+        <div id="results"></div>
+        
+        <h2 class="text-center">Ask a Question</h2>
+        <form id="questionForm">
+            <div class="form-group">
+                <label for="question">Question:</label>
+                <input type="text" class="form-control" id="question" name="question" required>
+            </div>
+            <div class="form-group">
+                <label for="context">Context :</label>
+                <textarea class="form-control" id="context" name="context"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Get Answer</button>
+        </form>
+        <div id="answerResult"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#searchForm').submit(function(event) {
+                event.preventDefault();
+                $('.loader').css('visibility', 'visible');
+                $.ajax({
+                    url: '/search',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(data) {
+                        $('.loader').css('visibility', 'hidden');
+                        if(data.results) {
+                            $('#results').html(data.results);
+                        } else {
+                            $('#results').html('<div class="alert alert-danger">No results found.</div>');
+                        }
+                    },
+                    error: function() {
+                        $('.loader').css('visibility', 'hidden');
+                        $('#results').html('<div class="alert alert-danger">There was a problem processing your request.</div>');
+                    }
+                });
+            });
+
+            $('#questionForm').submit(function(event) {
+                event.preventDefault();
+                $('.loader').css('visibility', 'visible');
+                $.ajax({
+                    url: '/answer',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(data) {
+                        $('.loader').css('visibility', 'hidden');
+                        if(!data.error) {
+                            $('#answerResult').html('<div class="alert alert-success"><strong>Answer:</strong> ' + data.answer + '</div><div><strong>Confidence Score:</strong> ' + data.score + '</div>');
+                        } else {
+                            $('#answerResult').html('<div class="alert alert-danger">' + data.error + '</div>');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
