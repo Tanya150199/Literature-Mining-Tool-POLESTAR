@@ -5,5 +5,5 @@ nltk
 scikit-learn
 transformers
 gunicorn
-tensorflow
-tf-keras
+tensorflow-cpu==2.11.0
+keras==2.11.0
