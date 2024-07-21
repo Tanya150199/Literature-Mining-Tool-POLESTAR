@@ -6,3 +6,4 @@ scikit-learn
 transformers
 gunicorn
 tensorflow
+tf-keras
